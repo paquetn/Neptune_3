@@ -55,6 +55,14 @@
 
 
 extern uint8_t Leveling_done_flg;
+
+// Commands run by the screen's auto-level button
+#if ENABLED(AUTO_BED_LEVELING_UBL)
+  // Home, probe mesh, fill unreachable edge points, store in slot 0, enable and save
+  #define MKS_AUTO_LEVEL_GCODE "G28\nG29 P1\nG29 P3\nG29 S0\nM420 S1\nM500"
+#else
+  #define MKS_AUTO_LEVEL_GCODE "G29" // G29中已开启G28
+#endif
 uint8_t Leveling_done_zhome_flg = 0;
 
 extern bool filament_change_flg;
@@ -843,7 +851,7 @@ void DGUSScreenHandler::Level_Ctrl_MKS(DGUS_VP_Variable &var, void *val_ptr) {
   #endif
   switch (lev_but) {
     case 0:
-      #if ENABLED(AUTO_BED_LEVELING_BILINEAR)
+      #if EITHER(AUTO_BED_LEVELING_BILINEAR, AUTO_BED_LEVELING_UBL)
 
         static uint8_t a_first_level = 1;
         if (a_first_level == 1) {
@@ -858,8 +866,7 @@ void DGUSScreenHandler::Level_Ctrl_MKS(DGUS_VP_Variable &var, void *val_ptr) {
       sprintf(buf, "M109 S%d", mks_AL_default_e0_temp);
       gcode.process_subcommands_now(PSTR(buf));
 
-      //2-------G29中已开启G28   
-      queue.inject_P(PSTR("G29"));
+      queue.inject_P(PSTR(MKS_AUTO_LEVEL_GCODE));
 
       #elif ENABLED(MESH_BED_LEVELING)
         mesh_point_count = GRID_MAX_POINTS;
@@ -905,7 +912,7 @@ void DGUSScreenHandler::MeshLevelDistanceConfig(DGUS_VP_Variable &var, void *val
 void DGUSScreenHandler::MeshLevel(DGUS_VP_Variable &var, void *val_ptr) {
   char Ebuf[50];
   // #if ENABLED(MESH_BED_LEVELING)  AUTO_BED_LEVELING_BILINEAR
-  #if ANY(MESH_BED_LEVELING, AUTO_BED_LEVELING_BILINEAR)
+  #if ANY(MESH_BED_LEVELING, AUTO_BED_LEVELING_BILINEAR, AUTO_BED_LEVELING_UBL)
     const uint16_t mesh_value = swap16(*(uint16_t *)val_ptr);
     // static uint8_t a_first_level = 1;
     char cmd_buf[30];
@@ -2193,8 +2200,7 @@ bool DGUSScreenHandler::loop() {
       gcode.process_subcommands_now(PSTR(Ebuf));
     #endif
 
-    //2-------G29中已开启G28 
-    queue.inject_P(PSTR("G29"));
+    queue.inject_P(PSTR(MKS_AUTO_LEVEL_GCODE));
   }
 
 

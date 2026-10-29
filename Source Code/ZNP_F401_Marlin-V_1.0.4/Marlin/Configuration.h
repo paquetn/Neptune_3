@@ -1657,7 +1657,7 @@
 
   //#define MESH_EDIT_GFX_OVERLAY   // Display a graphics overlay while editing the mesh
 
-  #define MESH_INSET 10              // Set Mesh bounds as an inset region of the bed
+  #define MESH_INSET 15              // Set Mesh bounds as an inset region of the bed (= PROBING_MARGIN so every point is probed)
   #define GRID_MAX_POINTS_X 11        // Don't use more than 15 points per axis, implementation limited.
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
@@ -1737,7 +1737,13 @@
  * Useful to retract or move the Z probe out of the way."G1 Z10 F12000\nG1 X15 Y330\nG1 Z0.5\nG1 Z10"
  */
 //2--------调平后的动作
-#define Z_PROBE_END_SCRIPT "M500\nM501\nG28 Z\nG90\nG1 Z0.1 F60"
+#if ENABLED(AUTO_BED_LEVELING_UBL)
+  // UBL: no M500/M501 here. With no mesh slot set yet, M501 calls ubl.reset() and wipes the
+  // freshly probed mesh. The screen's auto-level sequence saves explicitly (G29 S0 + M500).
+  #define Z_PROBE_END_SCRIPT "G28 Z\nG90\nG1 Z0.1 F60"
+#else
+  #define Z_PROBE_END_SCRIPT "M500\nM501\nG28 Z\nG90\nG1 Z0.1 F60"
+#endif
 
 // @section homing
 

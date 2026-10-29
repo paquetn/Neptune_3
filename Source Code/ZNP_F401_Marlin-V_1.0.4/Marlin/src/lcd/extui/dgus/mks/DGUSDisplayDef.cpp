@@ -67,7 +67,8 @@ uint16_t AUTO_ZOffset_distanceStep = 0;
 float ZOffset_distance = 10;//0.1;//扩大10倍
 float mesh_adj_distance = 0.01;
 float Z_distance = 0.1;
-//extern bed_mesh_t z_values; // Commented out for UBL via OctoPrint
+//extern bed_mesh_t z_values;
+#define MKS_MESH_IDX(N) (((GRID_MAX_POINTS_X - 1) * (N) + 1) / 3)
 
 //struct { uint16_t h, m, s; } dgus_time;
 
@@ -931,23 +932,23 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
   // VPHELPER(VP_Level_Point_Five_X, &mks_corner_offsets[4].x, ScreenHandler.HandleChangeLevelPoint_MKS, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
   // VPHELPER(VP_Level_Point_Five_Y, &mks_corner_offsets[4].y, ScreenHandler.HandleChangeLevelPoint_MKS, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
 
-  // UBL points - disabled for OctoPrint UBL control
-  // VPHELPER(VP_LEVELING_POINT_OFFSET1, &z_values[0][0], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET2, &z_values[0][1], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET3, &z_values[0][2], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET4, &z_values[0][3], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET5, &z_values[1][0], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET6, &z_values[1][1], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET7, &z_values[1][2], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET8, &z_values[1][3], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET9, &z_values[2][0], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET10, &z_values[2][1], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET11, &z_values[2][2], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET12, &z_values[2][3], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET13, &z_values[3][0], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET14, &z_values[3][1], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET15, &z_values[3][2], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
-  // VPHELPER(VP_LEVELING_POINT_OFFSET16, &z_values[3][3], nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),  
+  // 4x4 mesh view: sample rows/cols 0, 1/3, 2/3 and last of the leveling grid (11x11 UBL -> 0,3,7,10)
+  VPHELPER(VP_LEVELING_POINT_OFFSET1, &Z_VALUES(MKS_MESH_IDX(0), MKS_MESH_IDX(0)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET2, &Z_VALUES(MKS_MESH_IDX(0), MKS_MESH_IDX(1)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET3, &Z_VALUES(MKS_MESH_IDX(0), MKS_MESH_IDX(2)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET4, &Z_VALUES(MKS_MESH_IDX(0), MKS_MESH_IDX(3)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET5, &Z_VALUES(MKS_MESH_IDX(1), MKS_MESH_IDX(0)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET6, &Z_VALUES(MKS_MESH_IDX(1), MKS_MESH_IDX(1)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET7, &Z_VALUES(MKS_MESH_IDX(1), MKS_MESH_IDX(2)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET8, &Z_VALUES(MKS_MESH_IDX(1), MKS_MESH_IDX(3)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET9, &Z_VALUES(MKS_MESH_IDX(2), MKS_MESH_IDX(0)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET10, &Z_VALUES(MKS_MESH_IDX(2), MKS_MESH_IDX(1)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET11, &Z_VALUES(MKS_MESH_IDX(2), MKS_MESH_IDX(2)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET12, &Z_VALUES(MKS_MESH_IDX(2), MKS_MESH_IDX(3)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET13, &Z_VALUES(MKS_MESH_IDX(3), MKS_MESH_IDX(0)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET14, &Z_VALUES(MKS_MESH_IDX(3), MKS_MESH_IDX(1)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET15, &Z_VALUES(MKS_MESH_IDX(3), MKS_MESH_IDX(2)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
+  VPHELPER(VP_LEVELING_POINT_OFFSET16, &Z_VALUES(MKS_MESH_IDX(3), MKS_MESH_IDX(3)), nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
 
   // Print Progress
   VPHELPER(VP_PrintProgress_Percentage, nullptr, nullptr, ScreenHandler.DGUSLCD_SendPrintProgressToDisplay),
